@@ -2309,3 +2309,570 @@ input, textarea, select {
 .stagger > *:nth-child(4) { animation-delay: 240ms; }
 .stagger > *:nth-child(5) { animation-delay: 320ms; }
 .stagger > *:nth-child(6) { animation-delay: 400ms; }
+
+/* ============================================================
+   NEW FEATURE STYLES — MLA Connect, Rankings, Citizen Confirm
+   Added incrementally — all existing styles above are preserved
+   ============================================================ */
+
+/* ── Shared: new status badges ─────────────────────────────── */
+.badge-awaiting {
+  background: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid #ddd6fe;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-citizen {
+  background: var(--teal-pale);
+  color: var(--teal);
+  border: 1px solid rgba(13,148,136,0.25);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Shared: page header section ───────────────────────────── */
+.page-header-section {
+  padding: 40px 0 32px;
+}
+
+/* ── Shared: progress bar ──────────────────────────────────── */
+.progress-track {
+  height: 8px;
+  background: var(--gray-100);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--teal-light));
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+}
+
+/* ── Shared: demo / prototype banners ─────────────────────── */
+.demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 0.78rem;
+  color: #92400e;
+  line-height: 1.5;
+}
+.prototype-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+  color: #1e40af;
+  line-height: 1.5;
+}
+
+/* ── Shared: form select ───────────────────────────────────── */
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  color: var(--gray-700);
+  background: var(--white);
+  transition: border-color var(--transition-fast);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.form-select:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+}
+.form-select:disabled {
+  background: var(--gray-50);
+  color: var(--gray-300);
+  cursor: not-allowed;
+}
+
+/* ── MLA Connect Page ──────────────────────────────────────── */
+.mla-connect-page {
+  padding-top: 80px;
+  padding-bottom: 80px;
+  min-height: 70vh;
+}
+
+/* Selector Card */
+.mla-selector-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-xl);
+  padding: 24px 28px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-sm);
+}
+.mla-selector-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.mla-selector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .mla-selector-grid { grid-template-columns: 1fr; }
+}
+
+/* Select box with chevron */
+.select-box { position: relative; }
+.select-wrapper { position: relative; }
+.select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  pointer-events: none;
+}
+
+/* Empty prompt */
+.mla-empty-prompt {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--gray-50);
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--gray-200);
+}
+.mla-empty-icon { font-size: 3rem; margin-bottom: 16px; }
+.mla-empty-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+.mla-empty-sub { font-size: 0.875rem; color: var(--gray-500); max-width: 380px; margin: 0 auto; }
+
+/* Stats grid */
+.mla-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media (max-width: 900px) {
+  .mla-stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+  .mla-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.mla-stat-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius-lg);
+  padding: 16px 14px;
+  text-align: center;
+  box-shadow: var(--shadow-xs);
+}
+.mla-stat-icon { font-size: 1.375rem; margin-bottom: 6px; }
+.mla-stat-value { font-family: var(--font-display); font-size: 1.625rem; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+.mla-stat-label { font-size: 0.75rem; color: var(--gray-500); font-weight: 500; }
+.mla-stat-note  { font-size: 0.7rem; color: var(--gray-400); margin-top: 4px; }
+
+/* Resolution bar */
+.mla-resolution-bar-wrap {
+  background: var(--white);
+  border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 28px;
+}
+
+/* Two-column layout */
+.mla-content-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .mla-content-grid { grid-template-columns: 1fr; }
+}
+
+/* MLA Info Card */
+.mla-info-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.mla-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.mla-name {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.mla-constituency {
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.mla-since-badge {
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--teal);
+  background: var(--teal-pale);
+  border-radius: var(--radius-full);
+  padding: 3px 12px;
+  margin: 0 auto 16px;
+  width: fit-content;
+  font-weight: 600;
+}
+.mla-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mla-detail-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+}
+.mla-detail-icon { font-size: 1rem; flex-shrink: 0; }
+.mla-detail-label { font-size: 0.7rem; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+.mla-detail-value { font-size: 0.8125rem; color: var(--gray-700); }
+
+/* Issue filters */
+.mla-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+/* Issue row */
+.mla-issue-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--white);
+  border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius-lg);
+  transition: box-shadow var(--transition-fast);
+}
+.mla-issue-row:hover { box-shadow: var(--shadow-md); }
+.mla-issue-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.125rem; flex-shrink: 0;
+}
+.mla-issue-title { font-size: 0.875rem; font-weight: 600; color: var(--navy); margin-bottom: 3px; }
+.mla-issue-meta {
+  font-size: 0.75rem; color: var(--gray-400);
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+}
+.mla-dot { color: var(--gray-200); }
+
+
+/* ── Constituency Rankings Page ────────────────────────────── */
+.rankings-page {
+  padding-top: 80px;
+  padding-bottom: 80px;
+  min-height: 70vh;
+}
+
+/* Disclaimer */
+.rankings-disclaimer {
+  background: #f5f3ff;
+  border: 1.5px solid #ddd6fe;
+  border-radius: var(--radius-xl);
+  padding: 20px 24px;
+  margin-bottom: 28px;
+}
+
+/* Controls */
+.rankings-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+  background: var(--white);
+  border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius-xl);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-xs);
+}
+
+/* Legend */
+.rankings-legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  font-size: 0.8125rem;
+  color: var(--gray-600);
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+
+/* Rankings list */
+.rankings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+/* Rank card */
+.rank-card {
+  display: flex;
+  gap: 16px;
+  background: var(--white);
+  border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius-xl);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+  align-items: flex-start;
+}
+.rank-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.rank-number {
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+  padding-top: 4px;
+}
+.rank-num-text {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--gray-300);
+}
+
+.rank-main { flex: 1; min-width: 0; }
+.rank-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.rank-name {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 3px;
+}
+.rank-location { font-size: 0.8125rem; color: var(--gray-500); }
+.rank-pct-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
+.rank-pct-value { font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; line-height: 1; }
+.rank-pct-label { font-size: 0.7rem; font-weight: 600; margin-top: 2px; }
+
+/* Metrics row */
+.rank-metrics {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.metric-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  min-width: 72px;
+}
+.metric-chip-icon { font-size: 0.875rem; margin-bottom: 2px; }
+.metric-chip-value { font-family: var(--font-display); font-size: 1rem; font-weight: 700; line-height: 1; }
+.metric-chip-label { font-size: 0.68rem; color: var(--gray-400); font-weight: 500; margin-top: 2px; }
+
+.rank-sample-note {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+
+/* Footer note */
+.rankings-footer-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+
+
+/* ── Feature 3: Citizen Confirmation ───────────────────────── */
+.citizen-confirm-panel {
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.ccp-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.ccp-title {
+  font-weight: 700;
+  color: var(--navy);
+  font-size: 0.9375rem;
+  margin-bottom: 6px;
+}
+.ccp-note {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  font-style: italic;
+  line-height: 1.5;
+}
+.ccp-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ccp-btn-confirm {
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  color: white;
+  box-shadow: var(--shadow-teal);
+  flex: 1;
+  min-width: 180px;
+}
+.ccp-btn-confirm:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+.ccp-btn-reopen {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1.5px solid #fecaca !important;
+  flex: 1;
+  min-width: 180px;
+}
+.ccp-btn-reopen:hover {
+  background: #fee2e2;
+  transform: translateY(-1px);
+}
+
+/* Citizen verified panel */
+.citizen-verified-panel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--teal-pale);
+  border: 1.5px solid rgba(13,148,136,0.25);
+  border-radius: var(--radius-xl);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.cvp-title { font-weight: 700; color: var(--teal); font-size: 0.9375rem; margin-bottom: 4px; }
+.cvp-sub { font-size: 0.8125rem; color: var(--gray-600); margin-bottom: 6px; line-height: 1.5; }
+.cvp-note { font-size: 0.8125rem; color: var(--gray-500); font-style: italic; }
+
+/* Citizen reopen panel */
+.citizen-reopen-panel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+  border-radius: var(--radius-xl);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.crp-title { font-weight: 700; color: #dc2626; font-size: 0.9375rem; margin-bottom: 4px; }
+.crp-sub { font-size: 0.8125rem; color: var(--gray-600); line-height: 1.5; }
+
+/* ── Responsive: rank cards on mobile ──────────────────────── */
+@media (max-width: 640px) {
+  .rank-card { flex-direction: column; }
+  .rank-number { width: auto; text-align: left; }
+  .rank-top-row { flex-direction: column; }
+  .rank-pct-badge { flex-direction: row; align-items: center; gap: 8px; width: fit-content; }
+  .ccp-actions { flex-direction: column; }
+  .ccp-btn-confirm, .ccp-btn-reopen { min-width: unset; }
+  .mla-filters { flex-direction: column; }
+}
+
+/* ── MLA Connect: inline notice boxes (UT / data-unavailable) ── */
+.mla-notice {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  font-weight: 500;
+  margin-top: 2px;
+}
+.mla-notice-info {
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  color: #1e40af;
+}
+.mla-notice-warn {
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  color: #92400e;
+}
+.mla-notice-gray {
+  background: var(--gray-50);
+  border: 1.5px solid var(--gray-200);
+  color: var(--gray-400);
+  font-style: italic;
+}

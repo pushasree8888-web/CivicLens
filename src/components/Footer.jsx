@@ -1,4 +1,4 @@
-import { MapPin, ChevronRight } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 export default function Footer({ onNavigate }) {
   const handleNav = (page) => {
@@ -32,6 +32,8 @@ export default function Footer({ onNavigate }) {
               <li onClick={() => handleNav('home')}>Home</li>
               <li onClick={() => handleNav('report')}>Report an Issue</li>
               <li onClick={() => handleNav('dashboard')}>Complaints Dashboard</li>
+              <li onClick={() => handleNav('mla')}>MLA Connect</li>
+              <li onClick={() => handleNav('rankings')}>Constituency Rankings</li>
               <li onClick={() => handleNav('admin')}>Admin Panel</li>
             </ul>
           </div>

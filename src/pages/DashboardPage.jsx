@@ -1,42 +1,48 @@
 import { useState } from 'react';
-import { Search, ThumbsUp, MapPin, Calendar, Filter, X } from 'lucide-react';
+import { Search, ThumbsUp, MapPin, Calendar, Filter, X, CheckCircle, RotateCcw, AlertTriangle, Info } from 'lucide-react';
 import { sampleComplaints, CATEGORIES } from '../data/sampleData';
 
 const STATUS_FILTERS = [
   { id: 'all', label: 'All Issues' },
   { id: 'pending', label: 'Pending' },
   { id: 'in_progress', label: 'In Progress' },
+  { id: 'awaiting_confirmation', label: 'Awaiting Confirm.' },
+  { id: 'citizen_verified', label: 'Citizen Verified' },
   { id: 'resolved', label: 'Resolved' },
   { id: 'rejected', label: 'Rejected' },
 ];
 
 const STATUS_CONFIG = {
-  pending: { label: 'Pending', class: 'badge-pending', dot: '#f59e0b' },
-  in_progress: { label: 'In Progress', class: 'badge-in_progress', dot: '#3b82f6' },
-  resolved: { label: 'Resolved', class: 'badge-resolved', dot: '#10b981' },
-  rejected: { label: 'Rejected', class: 'badge-rejected', dot: '#ef4444' },
+  pending:               { label: 'Pending',             class: 'badge-pending' },
+  in_progress:           { label: 'In Progress',         class: 'badge-in_progress' },
+  resolved:              { label: 'Resolved',            class: 'badge-resolved' },
+  rejected:              { label: 'Rejected',            class: 'badge-rejected' },
+  awaiting_confirmation: { label: 'Awaiting Confirm.',   class: 'badge-awaiting' },
+  citizen_verified:      { label: 'Citizen Verified',    class: 'badge-citizen' },
 };
 
 const CAT_COLORS = {
-  pothole: { bg: '#fff7ed', border: '#fed7aa', icon: '#f97316' },
-  garbage: { bg: '#f0fdf4', border: '#bbf7d0', icon: '#22c55e' },
-  water: { bg: '#eff6ff', border: '#bfdbfe', icon: '#3b82f6' },
-  road: { bg: '#faf5ff', border: '#e9d5ff', icon: '#a855f7' },
+  pothole:     { bg: '#fff7ed', border: '#fed7aa', icon: '#f97316' },
+  garbage:     { bg: '#f0fdf4', border: '#bbf7d0', icon: '#22c55e' },
+  water:       { bg: '#eff6ff', border: '#bfdbfe', icon: '#3b82f6' },
+  road:        { bg: '#faf5ff', border: '#e9d5ff', icon: '#a855f7' },
   streetlight: { bg: '#fefce8', border: '#fef08a', icon: '#eab308' },
-  other: { bg: '#f9fafb', border: '#e5e7eb', icon: '#6b7280' },
+  other:       { bg: '#f9fafb', border: '#e5e7eb', icon: '#6b7280' },
 };
 
 export default function DashboardPage({ onNavigate }) {
-  const [search, setSearch] = useState('');
+  const [search, setSearch]           = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [catFilter, setCatFilter] = useState('all');
-  const [upvoted, setUpvoted] = useState(new Set());
-  const [selected, setSelected] = useState(null);
+  const [catFilter, setCatFilter]     = useState('all');
+  const [upvoted, setUpvoted]         = useState(new Set());
+  const [selected, setSelected]       = useState(null);
+  // Per-complaint citizen confirmation state (prototype — resets on page refresh)
+  const [confirmations, setConfirmations] = useState({});
 
   const filtered = sampleComplaints.filter((c) => {
     const matchStatus = statusFilter === 'all' || c.status === statusFilter;
-    const matchCat = catFilter === 'all' || c.category === catFilter;
-    const matchSearch = !search || 
+    const matchCat    = catFilter    === 'all' || c.category === catFilter;
+    const matchSearch = !search ||
       c.title.toLowerCase().includes(search.toLowerCase()) ||
       c.location.toLowerCase().includes(search.toLowerCase()) ||
       c.description.toLowerCase().includes(search.toLowerCase());
@@ -52,6 +58,24 @@ export default function DashboardPage({ onNavigate }) {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  };
+
+  const handleConfirm = (complaintId, action) => {
+    setConfirmations(prev => ({
+      ...prev,
+      [complaintId]: {
+        action,         // 'confirmed' | 'reopened'
+        timestamp: new Date().toLocaleString('en-IN'),
+      },
+    }));
+  };
+
+  // Get effective status (may be overridden by local confirmation state)
+  const getEffectiveStatus = (complaint) => {
+    const conf = confirmations[complaint.id];
+    if (conf?.action === 'confirmed') return 'citizen_verified';
+    if (conf?.action === 'reopened') return 'pending';
+    return complaint.status;
   };
 
   return (
@@ -148,10 +172,11 @@ export default function DashboardPage({ onNavigate }) {
         ) : (
           <div className="complaints-grid">
             {filtered.map((complaint) => {
-              const cat = getCat(complaint.category);
-              const catStyle = CAT_COLORS[complaint.category] || CAT_COLORS.other;
-              const statusCfg = STATUS_CONFIG[complaint.status];
-              const voted = upvoted.has(complaint.id);
+              const cat        = getCat(complaint.category);
+              const catStyle   = CAT_COLORS[complaint.category] || CAT_COLORS.other;
+              const effStatus  = getEffectiveStatus(complaint);
+              const statusCfg  = STATUS_CONFIG[effStatus] || STATUS_CONFIG.pending;
+              const voted      = upvoted.has(complaint.id);
 
               return (
                 <div
@@ -217,21 +242,30 @@ export default function DashboardPage({ onNavigate }) {
           onClose={() => setSelected(null)}
           getCat={getCat}
           catColors={CAT_COLORS}
+          confirmation={confirmations[selected.id]}
+          onConfirm={handleConfirm}
         />
       )}
     </div>
   );
 }
 
-function ComplaintModal({ complaint, onClose, getCat, catColors }) {
-  const cat = getCat(complaint.category);
+// ─── Complaint Modal (extended with citizen confirmation) ─────────────────────
+function ComplaintModal({ complaint, onClose, getCat, catColors, confirmation, onConfirm }) {
+  const cat      = getCat(complaint.category);
   const catStyle = catColors[complaint.category] || catColors.other;
-  const statusCfg = {
-    pending: { label: 'Pending', class: 'badge-pending' },
-    in_progress: { label: 'In Progress', class: 'badge-in_progress' },
-    resolved: { label: 'Resolved', class: 'badge-resolved' },
-    rejected: { label: 'Rejected', class: 'badge-rejected' },
-  }[complaint.status];
+
+  // Effective status after local confirmation action
+  let effStatus = complaint.status;
+  if (confirmation?.action === 'confirmed') effStatus = 'citizen_verified';
+  if (confirmation?.action === 'reopened')  effStatus = 'pending';
+
+  const statusCfg = STATUS_CONFIG[effStatus] || STATUS_CONFIG.pending;
+
+  // Should we show confirmation panel?
+  const showConfirmPanel =
+    (complaint.status === 'awaiting_confirmation' || complaint.status === 'citizen_verified') &&
+    !confirmation; // hide once user has acted in this session
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -239,7 +273,7 @@ function ComplaintModal({ complaint, onClose, getCat, catColors }) {
         style={{
           background: 'var(--white)',
           borderRadius: 'var(--radius-2xl)',
-          maxWidth: 600,
+          maxWidth: 620,
           width: '100%',
           maxHeight: '90vh',
           overflowY: 'auto',
@@ -321,6 +355,66 @@ function ComplaintModal({ complaint, onClose, getCat, catColors }) {
             <DetailItem icon={<ThumbsUp size={15} />} label="Upvotes" value={complaint.upvotes} />
           </div>
 
+          {/* ── CITIZEN CONFIRMATION PANEL (Feature 3) ── */}
+          {/* Panel: Awaiting confirmation (admin marked resolved, waiting for citizen) */}
+          {showConfirmPanel && complaint.status === 'awaiting_confirmation' && (
+            <CitizenConfirmPanel
+              resolutionNote={complaint.resolutionNote}
+              complaintId={complaint.id}
+              reportedBy={complaint.reportedBy}
+              onConfirm={onConfirm}
+            />
+          )}
+
+          {/* Panel: Already citizen-verified in sample data */}
+          {complaint.status === 'citizen_verified' && !confirmation && (
+            <div className="citizen-verified-panel">
+              <CheckCircle size={20} style={{ color: 'var(--teal)' }} />
+              <div>
+                <p className="cvp-title">Citizen-Verified Resolution ✅</p>
+                <p className="cvp-sub">
+                  {complaint.reportedBy} confirmed this issue was resolved on{' '}
+                  {complaint.citizenConfirmedAt ? formatDate(complaint.citizenConfirmedAt) : 'record date'}.
+                </p>
+                {complaint.resolutionNote && (
+                  <p className="cvp-note">"{complaint.resolutionNote}"</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Panel: User has just confirmed in this session */}
+          {confirmation?.action === 'confirmed' && (
+            <div className="citizen-verified-panel">
+              <CheckCircle size={20} style={{ color: 'var(--teal)' }} />
+              <div>
+                <p className="cvp-title">You confirmed this resolution ✅</p>
+                <p className="cvp-sub">
+                  Recorded at {confirmation.timestamp}.{' '}
+                  <span style={{ color: 'var(--gray-400)' }}>
+                    (Prototype: this confirmation resets on page refresh. A backend is required for persistence.)
+                  </span>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Panel: User has just reopened in this session */}
+          {confirmation?.action === 'reopened' && (
+            <div className="citizen-reopen-panel">
+              <RotateCcw size={20} style={{ color: '#ef4444' }} />
+              <div>
+                <p className="crp-title">You reopened this complaint 🔴</p>
+                <p className="crp-sub">
+                  Recorded at {confirmation.timestamp}.{' '}
+                  <span style={{ color: 'var(--gray-400)' }}>
+                    (Prototype: this action resets on page refresh. A backend is required for persistence.)
+                  </span>
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Timeline */}
           <div style={{
             background: 'var(--gray-50)', borderRadius: 'var(--radius-lg)',
@@ -332,8 +426,9 @@ function ComplaintModal({ complaint, onClose, getCat, catColors }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <TimelineItem label="Submitted" date={complaint.date} done />
               <TimelineItem label="Under Review" date={complaint.status !== 'pending' ? 'Oct 12, 2024' : null} done={complaint.status !== 'pending'} />
-              <TimelineItem label="In Progress" date={['in_progress', 'resolved'].includes(complaint.status) ? 'Oct 13, 2024' : null} done={['in_progress', 'resolved'].includes(complaint.status)} />
-              <TimelineItem label="Resolved" date={complaint.status === 'resolved' ? 'Oct 15, 2024' : null} done={complaint.status === 'resolved'} />
+              <TimelineItem label="In Progress" date={['in_progress', 'resolved', 'awaiting_confirmation', 'citizen_verified'].includes(effStatus) ? 'Oct 13, 2024' : null} done={['in_progress', 'resolved', 'awaiting_confirmation', 'citizen_verified'].includes(effStatus)} />
+              <TimelineItem label="Awaiting Citizen Confirmation" date={['awaiting_confirmation', 'citizen_verified'].includes(effStatus) ? 'Oct 15, 2024' : null} done={['awaiting_confirmation', 'citizen_verified'].includes(effStatus)} />
+              <TimelineItem label="Citizen-Verified Resolved" date={effStatus === 'citizen_verified' ? (complaint.citizenConfirmedAt || 'Oct 16, 2024') : null} done={effStatus === 'citizen_verified'} />
             </div>
           </div>
         </div>
@@ -342,6 +437,62 @@ function ComplaintModal({ complaint, onClose, getCat, catColors }) {
   );
 }
 
+// ─── Citizen Confirm Panel ────────────────────────────────────────────────────
+function CitizenConfirmPanel({ resolutionNote, complaintId, reportedBy, onConfirm }) {
+  const [busy, setBusy] = useState(false);
+
+  const handleAction = (action) => {
+    setBusy(true);
+    setTimeout(() => {
+      onConfirm(complaintId, action);
+      setBusy(false);
+    }, 400);
+  };
+
+  return (
+    <div className="citizen-confirm-panel">
+      {/* Prototype banner */}
+      <div className="prototype-banner">
+        <Info size={13} />
+        <span>
+          <strong>Prototype feature</strong> — In production, only the original complainant ({reportedBy}) can confirm or reopen.
+          Client-side checks do not provide real access control. A backend with authentication is required for security.
+        </span>
+      </div>
+
+      <div className="ccp-header">
+        <AlertTriangle size={20} style={{ color: '#f59e0b', flexShrink: 0 }} />
+        <div>
+          <p className="ccp-title">Admin has marked this as Resolved — Your confirmation needed</p>
+          {resolutionNote && (
+            <p className="ccp-note">"{resolutionNote}"</p>
+          )}
+        </div>
+      </div>
+
+      <div className="ccp-actions">
+        <button
+          className="btn ccp-btn-confirm"
+          onClick={() => handleAction('confirmed')}
+          disabled={busy}
+        >
+          <CheckCircle size={16} />
+          {busy ? 'Processing…' : 'Confirm Resolution'}
+        </button>
+        <button
+          className="btn ccp-btn-reopen"
+          onClick={() => handleAction('reopened')}
+          disabled={busy}
+        >
+          <RotateCcw size={16} />
+          {busy ? 'Processing…' : 'Problem Not Resolved — Reopen'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Shared sub-components ───────────────────────────────────────────────────
 function DetailItem({ icon, label, value, mono }) {
   return (
     <div style={{

@@ -5,6 +5,8 @@ const navItems = [
   { label: 'Home', page: 'home' },
   { label: 'Report Issue', page: 'report' },
   { label: 'Dashboard', page: 'dashboard' },
+  { label: 'MLA Connect', page: 'mla' },
+  { label: 'Rankings', page: 'rankings' },
   { label: 'Admin', page: 'admin' },
   { label: 'About', page: 'about' },
 ];
